@@ -17,4 +17,10 @@ return [
     '_profiler_router' => [['token'], ['_controller' => 'web_profiler.controller.router::panelAction'], [], [['text', '/router'], ['variable', '/', '[^/]++', 'token', true], ['text', '/_profiler']], [], [], []],
     '_profiler_exception' => [['token'], ['_controller' => 'web_profiler.controller.exception_panel::body'], [], [['text', '/exception'], ['variable', '/', '[^/]++', 'token', true], ['text', '/_profiler']], [], [], []],
     '_profiler_exception_css' => [['token'], ['_controller' => 'web_profiler.controller.exception_panel::stylesheet'], [], [['text', '/exception.css'], ['variable', '/', '[^/]++', 'token', true], ['text', '/_profiler']], [], [], []],
+    'app_test' => [[], ['_controller' => 'App\\Controller\\TestController::index'], [], [['text', '/get']], [], [], []],
+    'app_test_post' => [[], ['_controller' => 'App\\Controller\\TestController::post'], [], [['text', '/post']], [], [], []],
+    'app_test_get_item' => [['id'], ['_controller' => 'App\\Controller\\TestController::getItem'], [], [['variable', '/', '[^/]++', 'id', true], ['text', '/get-item']], [], [], []],
+    'App\Controller\TestController::index' => [[], ['_controller' => 'App\\Controller\\TestController::index'], [], [['text', '/get']], [], [], []],
+    'App\Controller\TestController::post' => [[], ['_controller' => 'App\\Controller\\TestController::post'], [], [['text', '/post']], [], [], []],
+    'App\Controller\TestController::getItem' => [['id'], ['_controller' => 'App\\Controller\\TestController::getItem'], [], [['variable', '/', '[^/]++', 'id', true], ['text', '/get-item']], [], [], []],
 ];
