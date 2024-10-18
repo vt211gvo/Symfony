@@ -22,21 +22,26 @@ class TestController extends AbstractController
     {
         $queryParams = $request->query->all();
 
-        return new JsonResponse($queryParams, 200);
+        return new JsonResponse($queryParams);
     }
 
     #[Route('/post', name: 'app_test_post', methods: ['POST'])]
     public function post(Request $request): JsonResponse
     {
+        if (isset($request)) {
+            return new JsonResponse(['message' => 'Fill in the required fields']);
+        }
         $requestBody = json_decode($request->getContent(), true);
 
-        return new JsonResponse($requestBody);
+        return new JsonResponse($requestBody, Response::HTTP_CREATED);
     }
 
     #[Route('/get-items', name: 'app_test_get_items', methods: ['GET'])]
-    public function getItems(Request $request): JsonResponse
+    public function getItems(): JsonResponse
     {
-        return new JsonResponse($this->items, 200);
+//dd(phpinfo());
+        $elements = $this->items;
+        return new JsonResponse($elements);
     }
 
     #[Route('/get-item/{id}', name: 'app_test_get_item', methods: ['GET'])]
@@ -48,7 +53,7 @@ class TestController extends AbstractController
             return new JsonResponse($item);
         }
 
-        return new JsonResponse(['message' => 'Item not found'], 404);
+        return new JsonResponse(['message' => 'Item not found'], Response::HTTP_NOT_FOUND);
     }
 
     #[Route('/delete-item/{id}', name: 'app_test_delete_item', methods: ['DELETE'])]
@@ -57,11 +62,11 @@ class TestController extends AbstractController
         foreach ($this->items as $key => $item) {
             if ($item['id'] == $id) {
                 unset($this->items[$key]);
-                return new JsonResponse(['message' => 'Item deleted']);
+                return new JsonResponse(['message' => "Item {$item['id']} deleted"], Response::HTTP_NO_CONTENT);
             }
         }
 
-        return new JsonResponse(['message' => 'Item not found'], 404);
+        return new JsonResponse(['message' => 'Item not found'], Response::HTTP_NOT_FOUND);
     }
 
     private function findItemById(string $id): ?array
