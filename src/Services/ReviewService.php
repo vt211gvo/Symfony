@@ -1,0 +1,103 @@
+<?php
+
+namespace App\Services;
+
+use App\Entity\Review;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
+class ReviewService
+{
+    public const REQUIRED_REVIEW_CREATE_FIELDS = [
+        'booking',
+        'rating',
+        'comment',
+    ];
+
+    private EntityManagerInterface $entityManager;
+    private RequestCheckerService $requestCheckerService;
+    private ObjectHandlerService $objectHandlerService;
+
+    /**
+     * @param EntityManagerInterface $entityManager
+     * @param RequestCheckerService $requestCheckerService
+     * @param ObjectHandlerService $objectHandlerService
+     */
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        RequestCheckerService $requestCheckerService,
+        ObjectHandlerService $objectHandlerService
+    ) {
+        $this->entityManager = $entityManager;
+        $this->requestCheckerService = $requestCheckerService;
+        $this->objectHandlerService = $objectHandlerService;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getReviews(): array
+    {
+        return $this->entityManager->getRepository(Review::class)->findAll();
+    }
+
+
+    /**
+     * @param int $id
+     * @return Review
+     */
+    public function getReviewById(int $id): Review
+    {
+        $review = $this->entityManager->getRepository(Review::class)->find($id);
+
+        if (!$review) {
+            throw new NotFoundHttpException('Review not found');
+        }
+
+        return $review;
+    }
+
+
+    /**
+     * @param array $data
+     * @return Review
+     * @throws \DateMalformedStringException
+     */
+    public function createReview(array $data): Review
+    {
+        $this->requestCheckerService::check($data, self::REQUIRED_REVIEW_CREATE_FIELDS);
+
+        $review = new Review();
+
+        return $this->objectHandlerService->saveEntity($review, $data);
+    }
+
+
+    /**
+     * @param int $id
+     * @param array $data
+     * @return Review
+     * @throws \DateMalformedStringException
+     */
+    public function updateReview(int $id, array $data): Review
+    {
+        $review = $this->getReviewById($id);
+
+        return $this->objectHandlerService->saveEntity($review, $data);
+    }
+
+
+    /**
+     * @param int $id
+     * @return void
+     */
+    public function deleteReview(int $id): void
+    {
+        $review = $this->getReviewById($id);
+
+        $this->entityManager->remove($review);
+        $this->entityManager->flush();
+    }
+
+}
