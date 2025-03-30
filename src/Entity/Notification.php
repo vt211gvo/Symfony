@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\NotificationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: NotificationRepository::class)]
 class Notification
@@ -18,9 +19,19 @@ class Notification
     private ?Guest $guest = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: 'Message cannot be longer than {{ limit }} characters.'
+    )]
     private ?string $message = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotNull]
+    #[Assert\Type(
+        type: '\DateTimeInterface',
+        message: 'The value {{ value }} is not a valid datetime.'
+    )]
     private ?\DateTimeInterface $sentAt = null;
 
     public function getId(): ?int

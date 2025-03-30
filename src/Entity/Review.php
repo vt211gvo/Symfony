@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ReviewRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ReviewRepository::class)]
 class Review
@@ -15,12 +16,17 @@ class Review
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'reviews')]
+    #[Assert\NotNull(message: 'Guest is required.')]
     private ?Guest $guest = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: 'Comment cannot be blank.')]
+    #[Assert\Length(min: 10, max: 1000, minMessage: 'Comment must be at least {{ limit }} characters long.', maxMessage: 'Comment cannot exceed {{ limit }} characters.')]
     private ?string $comment = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message: 'Rating is required.')]
+    #[Assert\Range(notInRangeMessage: 'Rating must be between {{ min }} and {{ max }}.', min: 1, max: 5)]
     private ?int $rating = null;
 
     public function getId(): ?int

@@ -6,6 +6,7 @@ use App\Repository\GuestRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: GuestRepository::class)]
 class Guest
@@ -16,9 +17,23 @@ class Guest
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: 'Document number cannot be longer than {{ limit }} characters.'
+    )]
     private ?string $documentNumber = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: 'Phone number cannot be longer than {{ limit }} characters.'
+    )]
+    #[Assert\Regex(
+        pattern: '/^\+?[0-9]{7,15}$/',
+        message: 'Phone number must be a valid international format.'
+    )]
     private ?string $phone = null;
 
     /**

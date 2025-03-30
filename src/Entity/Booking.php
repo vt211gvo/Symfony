@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BookingRepository::class)]
 class Booking
@@ -17,24 +18,38 @@ class Booking
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookings')]
+    #[Assert\NotNull]
     private ?Guest $guest = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookings')]
+    #[Assert\NotNull]
     private ?Bed $bed = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Assert\NotNull]
     private ?\DateTimeInterface $checkinDate = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Assert\NotNull]
+    #[Assert\GreaterThan(propertyPath: "checkinDate", message: "Checkout date must be later than check-in date.")]
     private ?\DateTimeInterface $checkoutDate = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotNull]
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: 'Status cannot be longer than {{ limit }} characters.'
+    )]
     private ?string $status = null;
 
     /**
      * @var Collection<int, Payment>
      */
     #[ORM\OneToMany(targetEntity: Payment::class, mappedBy: 'booking')]
+    #[Assert\All([
+        new Assert\Type(type: Payment::class, message: 'Each payment must be a valid Payment object.')
+    ])]
     private Collection $payments;
 
     public function __construct()
@@ -128,7 +143,6 @@ class Booking
     public function removePayment(Payment $payment): static
     {
         if ($this->payments->removeElement($payment)) {
-            // set the owning side to null (unless already changed)
             if ($payment->getBooking() === $this) {
                 $payment->setBooking(null);
             }
