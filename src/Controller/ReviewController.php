@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Services\ReviewService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,11 +22,18 @@ class ReviewController extends AbstractController
     private ReviewService $reviewService;
 
     /**
-     * @param ReviewService $reviewService
+     * @var EntityManagerInterface
      */
-    public function __construct(ReviewService $reviewService)
+    private EntityManagerInterface $entityManager;
+
+    /**
+     * @param ReviewService $reviewService
+     * @param EntityManagerInterface $entityManager
+     */
+    public function __construct(ReviewService $reviewService, EntityManagerInterface $entityManager)
     {
         $this->reviewService = $reviewService;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -59,6 +67,8 @@ class ReviewController extends AbstractController
     {
         $requestData = json_decode($request->getContent(), true);
         $review = $this->reviewService->createReview($requestData);
+        $this->entityManager->flush();
+
         return new JsonResponse($review, Response::HTTP_CREATED);
     }
 
@@ -73,6 +83,8 @@ class ReviewController extends AbstractController
     {
         $requestData = json_decode($request->getContent(), true);
         $review = $this->reviewService->updateReview($id, $requestData);
+        $this->entityManager->flush();
+
         return new JsonResponse($review, Response::HTTP_OK);
     }
 

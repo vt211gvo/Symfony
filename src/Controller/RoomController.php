@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Services\RoomService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,11 +22,18 @@ class RoomController extends AbstractController
     private RoomService $roomService;
 
     /**
-     * @param RoomService $roomService
+     * @var EntityManagerInterface
      */
-    public function __construct(RoomService $roomService)
+    private EntityManagerInterface $entityManager;
+
+    /**
+     * @param RoomService $roomService
+     * @param EntityManagerInterface $entityManager
+     */
+    public function __construct(RoomService $roomService, EntityManagerInterface $entityManager)
     {
         $this->roomService = $roomService;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -59,6 +67,8 @@ class RoomController extends AbstractController
     {
         $requestData = json_decode($request->getContent(), true);
         $room = $this->roomService->createRoom($requestData);
+        $this->entityManager->flush();
+
         return new JsonResponse($room, Response::HTTP_CREATED);
     }
 
@@ -73,6 +83,8 @@ class RoomController extends AbstractController
     {
         $requestData = json_decode($request->getContent(), true);
         $room = $this->roomService->updateRoom($id, $requestData);
+        $this->entityManager->flush();
+
         return new JsonResponse($room, Response::HTTP_OK);
     }
 

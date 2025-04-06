@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Services\StaffService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,11 +22,18 @@ class StaffController extends AbstractController
     private StaffService $staffService;
 
     /**
-     * @param StaffService $staffService
+     * @var EntityManagerInterface
      */
-    public function __construct(StaffService $staffService)
+    private EntityManagerInterface $entityManager;
+
+    /**
+     * @param StaffService $staffService
+     * @param EntityManagerInterface $entityManager
+     */
+    public function __construct(StaffService $staffService, EntityManagerInterface $entityManager)
     {
         $this->staffService = $staffService;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -65,6 +73,8 @@ class StaffController extends AbstractController
     {
         $requestData = json_decode($request->getContent(), true);
         $staffMember = $this->staffService->createStaff($requestData);
+        $this->entityManager->flush();
+
         return new JsonResponse($staffMember, Response::HTTP_CREATED);
     }
 
@@ -81,6 +91,8 @@ class StaffController extends AbstractController
     {
         $requestData = json_decode($request->getContent(), true);
         $staffMember = $this->staffService->updateStaff($id, $requestData);
+        $this->entityManager->flush();
+
         return new JsonResponse($staffMember, Response::HTTP_OK);
     }
 

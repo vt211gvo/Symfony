@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Services\BookingService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,11 +22,18 @@ class BookingController extends AbstractController
     private BookingService $bookingService;
 
     /**
-     * @param BookingService $bookingService
+     * @var EntityManagerInterface
      */
-    public function __construct(BookingService $bookingService)
+    private EntityManagerInterface $entityManager;
+
+    /**
+     * @param BookingService $bookingService
+     * @param EntityManagerInterface $entityManager
+     */
+    public function __construct(BookingService $bookingService, EntityManagerInterface $entityManager)
     {
         $this->bookingService = $bookingService;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -59,6 +67,8 @@ class BookingController extends AbstractController
     {
         $requestData = json_decode($request->getContent(), true);
         $booking = $this->bookingService->createBooking($requestData);
+        $this->entityManager->flush();
+
         return new JsonResponse($booking, Response::HTTP_CREATED);
     }
 
@@ -73,6 +83,8 @@ class BookingController extends AbstractController
     {
         $requestData = json_decode($request->getContent(), true);
         $booking = $this->bookingService->updateBooking($id, $requestData);
+        $this->entityManager->flush();
+
         return new JsonResponse($booking, Response::HTTP_OK);
     }
 

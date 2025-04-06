@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Services\BedService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,11 +19,19 @@ class BedController extends AbstractController
     private BedService $bedService;
 
     /**
-     * @param BedService $bedService
+     * @var EntityManagerInterface
      */
-    public function __construct(BedService $bedService)
+    private EntityManagerInterface $entityManager;
+
+
+    /**
+     * @param BedService $bedService
+     * @param EntityManagerInterface $entityManager
+     */
+    public function __construct(BedService $bedService, EntityManagerInterface $entityManager)
     {
         $this->bedService = $bedService;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -56,6 +65,8 @@ class BedController extends AbstractController
     {
         $requestData = json_decode($request->getContent(), true);
         $bed = $this->bedService->createBed($requestData);
+        $this->entityManager->flush();
+
         return new JsonResponse($bed, Response::HTTP_CREATED);
     }
 
@@ -70,6 +81,8 @@ class BedController extends AbstractController
     {
         $requestData = json_decode($request->getContent(), true);
         $bed = $this->bedService->updateBed($id, $requestData);
+        $this->entityManager->flush();
+
         return new JsonResponse($bed, Response::HTTP_OK);
     }
 

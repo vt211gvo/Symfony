@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Services\GuestService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,11 +22,18 @@ class GuestController extends AbstractController
     private GuestService $guestService;
 
     /**
-     * @param GuestService $guestService
+     * @var EntityManagerInterface
      */
-    public function __construct(GuestService $guestService)
+    private EntityManagerInterface $entityManager;
+
+    /**
+     * @param GuestService $guestService
+     * @param EntityManagerInterface $entityManager
+     */
+    public function __construct(GuestService $guestService, EntityManagerInterface $entityManager)
     {
         $this->guestService = $guestService;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -59,6 +67,8 @@ class GuestController extends AbstractController
     {
         $requestData = json_decode($request->getContent(), true);
         $guest = $this->guestService->createGuest($requestData);
+        $this->entityManager->flush();
+
         return new JsonResponse($guest, Response::HTTP_CREATED);
     }
 
@@ -73,6 +83,8 @@ class GuestController extends AbstractController
     {
         $requestData = json_decode($request->getContent(), true);
         $guest = $this->guestService->updateGuest($id, $requestData);
+        $this->entityManager->flush();
+
         return new JsonResponse($guest, Response::HTTP_OK);
     }
 

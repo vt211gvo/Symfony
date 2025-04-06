@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Services\NotificationService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,11 +22,18 @@ class NotificationController extends AbstractController
     private NotificationService $notificationService;
 
     /**
-     * @param NotificationService $notificationService
+     * @var EntityManagerInterface
      */
-    public function __construct(NotificationService $notificationService)
+    private EntityManagerInterface $entityManager;
+
+    /**
+     * @param NotificationService $notificationService
+     * @param EntityManagerInterface $entityManager
+     */
+    public function __construct(NotificationService $notificationService, EntityManagerInterface $entityManager)
     {
         $this->notificationService = $notificationService;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -59,6 +67,8 @@ class NotificationController extends AbstractController
     {
         $requestData = json_decode($request->getContent(), true);
         $notification = $this->notificationService->createNotification($requestData);
+        $this->entityManager->flush();
+
         return new JsonResponse($notification, Response::HTTP_CREATED);
     }
 
@@ -73,6 +83,8 @@ class NotificationController extends AbstractController
     {
         $requestData = json_decode($request->getContent(), true);
         $notification = $this->notificationService->updateNotification($id, $requestData);
+        $this->entityManager->flush();
+
         return new JsonResponse($notification, Response::HTTP_OK);
     }
 

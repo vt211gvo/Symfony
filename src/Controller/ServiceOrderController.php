@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Services\ServiceOrderService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,11 +22,18 @@ class ServiceOrderController extends AbstractController
     private ServiceOrderService $serviceOrderService;
 
     /**
-     * @param ServiceOrderService $serviceOrderService
+     * @var EntityManagerInterface
      */
-    public function __construct(ServiceOrderService $serviceOrderService)
+    private EntityManagerInterface $entityManager;
+
+    /**
+     * @param ServiceOrderService $serviceOrderService
+     * @param EntityManagerInterface $entityManager
+     */
+    public function __construct(ServiceOrderService $serviceOrderService, EntityManagerInterface $entityManager)
     {
         $this->serviceOrderService = $serviceOrderService;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -59,6 +67,8 @@ class ServiceOrderController extends AbstractController
     {
         $requestData = json_decode($request->getContent(), true);
         $serviceOrder = $this->serviceOrderService->createServiceOrder($requestData);
+        $this->entityManager->flush();
+
         return new JsonResponse($serviceOrder, Response::HTTP_CREATED);
     }
 
@@ -73,6 +83,8 @@ class ServiceOrderController extends AbstractController
     {
         $requestData = json_decode($request->getContent(), true);
         $serviceOrder = $this->serviceOrderService->updateServiceOrder($id, $requestData);
+        $this->entityManager->flush();
+
         return new JsonResponse($serviceOrder, Response::HTTP_OK);
     }
 

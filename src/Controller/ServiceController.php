@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Services\ServiceService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,11 +22,18 @@ class ServiceController extends AbstractController
     private ServiceService $serviceService;
 
     /**
-     * @param ServiceService $serviceService
+     * @var EntityManagerInterface
      */
-    public function __construct(ServiceService $serviceService)
+    private EntityManagerInterface $entityManager;
+
+    /**
+     * @param ServiceService $serviceService
+     * @param EntityManagerInterface $entityManager
+     */
+    public function __construct(ServiceService $serviceService, EntityManagerInterface $entityManager)
     {
         $this->serviceService = $serviceService;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -59,6 +67,8 @@ class ServiceController extends AbstractController
     {
         $requestData = json_decode($request->getContent(), true);
         $service = $this->serviceService->createService($requestData);
+        $this->entityManager->flush();
+
         return new JsonResponse($service, Response::HTTP_CREATED);
     }
 
@@ -73,6 +83,8 @@ class ServiceController extends AbstractController
     {
         $requestData = json_decode($request->getContent(), true);
         $service = $this->serviceService->updateService($id, $requestData);
+        $this->entityManager->flush();
+
         return new JsonResponse($service, Response::HTTP_OK);
     }
 

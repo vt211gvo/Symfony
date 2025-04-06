@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Services\PaymentService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,11 +22,18 @@ class PaymentController extends AbstractController
     private PaymentService $paymentService;
 
     /**
-     * @param PaymentService $paymentService
+     * @var EntityManagerInterface
      */
-    public function __construct(PaymentService $paymentService)
+    private EntityManagerInterface $entityManager;
+
+    /**
+     * @param PaymentService $paymentService
+     * @param EntityManagerInterface $entityManager
+     */
+    public function __construct(PaymentService $paymentService, EntityManagerInterface $entityManager)
     {
         $this->paymentService = $paymentService;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -59,6 +67,8 @@ class PaymentController extends AbstractController
     {
         $requestData = json_decode($request->getContent(), true);
         $payment = $this->paymentService->createPayment($requestData);
+        $this->entityManager->flush();
+
         return new JsonResponse($payment, Response::HTTP_CREATED);
     }
 
@@ -73,6 +83,8 @@ class PaymentController extends AbstractController
     {
         $requestData = json_decode($request->getContent(), true);
         $payment = $this->paymentService->updatePayment($id, $requestData);
+        $this->entityManager->flush();
+
         return new JsonResponse($payment, Response::HTTP_OK);
     }
 
