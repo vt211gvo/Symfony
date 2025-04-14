@@ -4,10 +4,11 @@ namespace App\Entity;
 
 use App\Repository\StaffRepository;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: StaffRepository::class)]
-class Staff
+class Staff implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -59,15 +60,35 @@ class Staff
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getPhone(): ?string
     {
         return $this->phone;
     }
 
+    /**
+     * @param string $phone
+     * @return $this
+     */
     public function setPhone(string $phone): static
     {
         $this->phone = $phone;
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'role' => $this->getRole(),
+            'name' => $this->getName(),
+            'phone' => $this->getPhone(),
+        ];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Entity\Service;
+use App\Repository\ServiceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -17,23 +18,29 @@ class ServiceService
     private EntityManagerInterface $entityManager;
     private RequestCheckerService $requestCheckerService;
     private ObjectHandlerService $objectHandlerService;
+    private ServiceRepository $serviceRepository;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         RequestCheckerService $requestCheckerService,
-        ObjectHandlerService $objectHandlerService
+        ObjectHandlerService $objectHandlerService,
+        ServiceRepository $serviceRepository
     ) {
         $this->entityManager = $entityManager;
         $this->requestCheckerService = $requestCheckerService;
         $this->objectHandlerService = $objectHandlerService;
+        $this->serviceRepository = $serviceRepository;
     }
 
     /**
+     * @param array $filters
+     * @param int $itemsPerPage
+     * @param int $page
      * @return array
      */
-    public function getServices(): array
+    public function getServices(array $filters, int $itemsPerPage, int $page): array
     {
-        return $this->entityManager->getRepository(Service::class)->findAll();
+        return $this->serviceRepository->getAllByFilter($filters, $itemsPerPage, $page);
     }
 
 

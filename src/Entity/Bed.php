@@ -6,10 +6,11 @@ use App\Repository\BedRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BedRepository::class)]
-class Bed
+class Bed implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -42,16 +43,26 @@ class Bed
         $this->bookings = new ArrayCollection();
     }
 
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * @return Room|null
+     */
     public function getRoom(): ?Room
     {
         return $this->room;
     }
 
+    /**
+     * @param Room|null $room
+     * @return $this
+     */
     public function setRoom(?Room $room): static
     {
         $this->room = $room;
@@ -59,11 +70,18 @@ class Bed
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getBedNumber(): ?string
     {
         return $this->bedNumber;
     }
 
+    /**
+     * @param string $bedNumber
+     * @return $this
+     */
     public function setBedNumber(string $bedNumber): static
     {
         $this->bedNumber = $bedNumber;
@@ -99,5 +117,14 @@ class Bed
         }
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'bedNumber' => $this->getBedNumber(),
+            'room' => $this->getRoom()?->getId(),
+        ];
     }
 }

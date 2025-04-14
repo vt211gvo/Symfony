@@ -37,13 +37,18 @@ class PaymentController extends AbstractController
     }
 
     /**
+     * @param Request $request
      * @return JsonResponse
      */
     #[Route('/', name: 'get_payments', methods: ['GET'])]
-    public function getPayments(): JsonResponse
+    public function getPayments(Request $request): JsonResponse
     {
-        $payments = $this->paymentService->getPayments();
-        return new JsonResponse($payments, Response::HTTP_OK);
+        $requestData = $request->query->all();
+        $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
+        $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
+
+        $data = $this->paymentService->getPayments();
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 
     /**

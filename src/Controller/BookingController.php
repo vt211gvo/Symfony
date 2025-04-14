@@ -37,13 +37,19 @@ class BookingController extends AbstractController
     }
 
     /**
+     * @param Request $request
      * @return JsonResponse
      */
     #[Route('/', name: 'get_bookings', methods: ['GET'])]
-    public function getBookings(): JsonResponse
+    public function getBookings(Request $request): JsonResponse
     {
-        $bookings = $this->bookingService->getBookings();
-        return new JsonResponse($bookings, Response::HTTP_OK);
+        $requestData = $request->query->all();
+        $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
+        $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
+
+        $data = $this->bookingService->getBookings($requestData, $itemsPerPage, $page);
+
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 
     /**

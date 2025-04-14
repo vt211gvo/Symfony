@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Entity\Booking;
+use App\Repository\BookingRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -19,31 +20,36 @@ class BookingService
     private EntityManagerInterface $entityManager;
     private RequestCheckerService $requestCheckerService;
     private ObjectHandlerService $objectHandlerService;
+    private BookingRepository $bookingRepository;
 
     /**
      * @param EntityManagerInterface $entityManager
      * @param RequestCheckerService $requestCheckerService
      * @param ObjectHandlerService $objectHandlerService
+     * @param BookingRepository $bookingRepository
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         RequestCheckerService $requestCheckerService,
-        ObjectHandlerService $objectHandlerService
+        ObjectHandlerService $objectHandlerService,
+        BookingRepository $bookingRepository
     ) {
         $this->entityManager = $entityManager;
         $this->requestCheckerService = $requestCheckerService;
         $this->objectHandlerService = $objectHandlerService;
+        $this->bookingRepository = $bookingRepository;
     }
-
 
     /**
+     * @param array $filters
+     * @param int $itemsPerPage
+     * @param int $page
      * @return array
      */
-    public function getBookings(): array
+    public function getBookings(array $filters, int $itemsPerPage, int $page): array
     {
-        return $this->entityManager->getRepository(Booking::class)->findAll();
+        return $this->bookingRepository->getAllByFilter($filters, $itemsPerPage, $page);
     }
-
 
     /**
      * @param int $id
@@ -60,7 +66,6 @@ class BookingService
         return $booking;
     }
 
-
     /**
      * @param array $data
      * @return Booking
@@ -75,7 +80,6 @@ class BookingService
         return $this->objectHandlerService->saveEntity($booking, $data);
     }
 
-
     /**
      * @param int $id
      * @param array $data
@@ -88,7 +92,6 @@ class BookingService
 
         return $this->objectHandlerService->saveEntity($booking, $data);
     }
-
 
     /**
      * @param int $id

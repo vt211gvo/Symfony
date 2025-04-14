@@ -5,10 +5,11 @@ namespace App\Entity;
 use App\Repository\PaymentRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PaymentRepository::class)]
-class Payment
+class Payment implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -85,5 +86,16 @@ class Payment
         $this->method = $method;
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'bookingId' => $this->booking?->getId(),
+            'amount' => $this->getAmount(),
+            'paymentDate' => $this->paymentDate?->format('Y-m-d H:i:s'),
+            'method' => $this->getMethod(),
+        ];
     }
 }

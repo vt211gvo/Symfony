@@ -5,10 +5,11 @@ namespace App\Entity;
 use App\Repository\ServiceOrderRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ServiceOrderRepository::class)]
-class ServiceOrder
+class ServiceOrder implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -65,10 +66,27 @@ class ServiceOrder
         return $this->orderDate;
     }
 
+    /**
+     * @param \DateTimeInterface $orderDate
+     * @return $this
+     */
     public function setOrderDate(\DateTimeInterface $orderDate): static
     {
         $this->orderDate = $orderDate;
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'guest' => $this->guest?->getId(),
+            'service' => $this->service?->getName(),
+            'orderDate' => $this->orderDate?->format('Y-m-d H:i:s'),
+        ];
     }
 }

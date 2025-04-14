@@ -5,10 +5,11 @@ namespace App\Entity;
 use App\Repository\NotificationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: NotificationRepository::class)]
-class Notification
+class Notification implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -73,5 +74,15 @@ class Notification
         $this->sentAt = $sentAt;
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'guestId' => $this->guest?->getId(),
+            'message' => $this->getMessage(),
+            'sentAt' => $this->getSentAt()?->format('Y-m-d H:i:s'),
+        ];
     }
 }

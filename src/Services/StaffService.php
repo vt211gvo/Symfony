@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Entity\Staff;
+use App\Repository\StaffRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -17,28 +18,35 @@ class StaffService
     private EntityManagerInterface $entityManager;
     private RequestCheckerService $requestCheckerService;
     private ObjectHandlerService $objectHandlerService;
+    private StaffRepository $staffRepository;
 
     /**
      * @param EntityManagerInterface $entityManager
      * @param RequestCheckerService $requestCheckerService
      * @param ObjectHandlerService $objectHandlerService
+     * @param StaffRepository $staffRepository
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         RequestCheckerService $requestCheckerService,
-        ObjectHandlerService $objectHandlerService
+        ObjectHandlerService $objectHandlerService,
+        StaffRepository $staffRepository
     ) {
         $this->entityManager = $entityManager;
         $this->requestCheckerService = $requestCheckerService;
         $this->objectHandlerService = $objectHandlerService;
+        $this->staffRepository = $staffRepository;
     }
 
     /**
+     * @param array $filters
+     * @param int $itemsPerPage
+     * @param int $page
      * @return array
      */
-    public function getStaff(): array
+    public function getStaff(array $filters, int $itemsPerPage, int $page): array
     {
-        return $this->entityManager->getRepository(Staff::class)->findAll();
+        return $this->staffRepository->getAllByFilter($filters, $itemsPerPage, $page);
     }
 
 

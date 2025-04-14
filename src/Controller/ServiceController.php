@@ -37,13 +37,18 @@ class ServiceController extends AbstractController
     }
 
     /**
+     * @param Request $request
      * @return JsonResponse
      */
     #[Route('/', name: 'get_services', methods: ['GET'])]
-    public function getServices(): JsonResponse
+    public function getServices(Request $request): JsonResponse
     {
-        $services = $this->serviceService->getServices();
-        return new JsonResponse($services, Response::HTTP_OK);
+        $requestData = $request->query->all();
+        $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
+        $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
+
+        $data = $this->serviceService->getServices();
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 
     /**

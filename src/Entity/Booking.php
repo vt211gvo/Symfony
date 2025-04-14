@@ -7,10 +7,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BookingRepository::class)]
-class Booking
+class Booking implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -149,5 +150,18 @@ class Booking
         }
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'guest' => $this->getGuest()?->getId(),
+            'bed' => $this->getBed()?->getId(),
+            'checkinDate' => $this->getCheckinDate()?->format('Y-m-d'),
+            'checkoutDate' => $this->getCheckoutDate()?->format('Y-m-d'),
+            'status' => $this->getStatus(),
+            'payments' => $this->getPayments()->map(fn($p) => $p->getId())->toArray(),
+        ];
     }
 }

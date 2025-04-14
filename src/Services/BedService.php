@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Entity\Bed;
+use App\Repository\BedRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -13,31 +14,51 @@ class BedService
         'bedNumber',
     ];
 
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
+    /**
+     * @var RequestCheckerService
+     */
     private RequestCheckerService $requestCheckerService;
+    /**
+     * @var ObjectHandlerService
+     */
     private ObjectHandlerService $objectHandlerService;
+
+    /**
+     * @var BedRepository
+     */
+    private BedRepository $bedRepository;
 
     /**
      * @param EntityManagerInterface $entityManager
      * @param RequestCheckerService $requestCheckerService
      * @param ObjectHandlerService $objectHandlerService
+     * @param BedRepository $bedRepository
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         RequestCheckerService $requestCheckerService,
-        ObjectHandlerService $objectHandlerService
+        ObjectHandlerService $objectHandlerService,
+        BedRepository $bedRepository
     ) {
         $this->entityManager = $entityManager;
         $this->requestCheckerService = $requestCheckerService;
         $this->objectHandlerService = $objectHandlerService;
+        $this->bedRepository = $bedRepository;
     }
 
     /**
+     * @param array $filters
+     * @param int $itemsPerPage
+     * @param int $page
      * @return array
      */
-    public function getBeds(): array
+    public function getBeds(array $filters, int $itemsPerPage, int $page): array
     {
-        return $this->entityManager->getRepository(Bed::class)->findAll();
+        return $this->bedRepository->getAllByFilter($filters, $itemsPerPage, $page);
     }
 
 

@@ -5,10 +5,11 @@ namespace App\Entity;
 use App\Repository\ReviewRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ReviewRepository::class)]
-class Review
+class Review implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -68,5 +69,15 @@ class Review
         $this->rating = $rating;
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'guestId' => $this->guest?->getId(),
+            'comment' => $this->getComment(),
+            'rating' => $this->getRating(),
+        ];
     }
 }

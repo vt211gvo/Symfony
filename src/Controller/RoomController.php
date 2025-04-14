@@ -37,13 +37,18 @@ class RoomController extends AbstractController
     }
 
     /**
+     * @param Request $request
      * @return JsonResponse
      */
     #[Route('/', name: 'get_rooms', methods: ['GET'])]
-    public function getRooms(): JsonResponse
+    public function getRooms(Request $request): JsonResponse
     {
-        $rooms = $this->roomService->getRooms();
-        return new JsonResponse($rooms, Response::HTTP_OK);
+        $requestData = $request->query->all();
+        $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
+        $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
+
+        $data = $this->roomService->getRooms();
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 
     /**

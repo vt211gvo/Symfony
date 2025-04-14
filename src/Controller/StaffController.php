@@ -39,13 +39,18 @@ class StaffController extends AbstractController
     /**
      * Get a list of all staff members.
      *
+     * @param Request $request
      * @return JsonResponse
      */
     #[Route('/', name: 'get_staff', methods: ['GET'])]
-    public function getStaff(): JsonResponse
+    public function getStaff(Request $request): JsonResponse
     {
-        $staffMembers = $this->staffService->getStaff();
-        return new JsonResponse($staffMembers, Response::HTTP_OK);
+        $requestData = $request->query->all();
+        $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
+        $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
+
+        $data = $this->staffService->getStaff();
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Entity\Guest;
+use App\Repository\GuestRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -18,32 +19,38 @@ class GuestService
     private EntityManagerInterface $entityManager;
     private RequestCheckerService $requestCheckerService;
     private ObjectHandlerService $objectHandlerService;
+    private GuestRepository $guestRepository;
 
     /**
      * @param EntityManagerInterface $entityManager
      * @param RequestCheckerService $requestCheckerService
      * @param ObjectHandlerService $objectHandlerService
+     * @param GuestRepository $guestRepository
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         RequestCheckerService $requestCheckerService,
-        ObjectHandlerService $objectHandlerService
+        ObjectHandlerService $objectHandlerService,
+        GuestRepository $guestRepository
     ) {
         $this->entityManager = $entityManager;
         $this->requestCheckerService = $requestCheckerService;
         $this->objectHandlerService = $objectHandlerService;
+        $this->guestRepository = $guestRepository;
     }
 
 
     /**
+     * @param array $filters
+     * @param int $itemsPerPage
+     * @param int $page
      * @return array
      */
-    public function getGuests(): array
+    public function getGuests(array $filters, int $itemsPerPage, int $page): array
     {
-        return $this->entityManager->getRepository(Guest::class)->findAll();
+        return $this->guestRepository->getAllByFilter($filters, $itemsPerPage, $page);
     }
-
-
+    
     /**
      * @param int $id
      * @return Guest

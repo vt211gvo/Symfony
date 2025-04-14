@@ -37,13 +37,18 @@ class NotificationController extends AbstractController
     }
 
     /**
+     * @param Request $request
      * @return JsonResponse
      */
     #[Route('/', name: 'get_notifications', methods: ['GET'])]
-    public function getNotifications(): JsonResponse
+    public function getNotifications(Request $request): JsonResponse
     {
-        $notifications = $this->notificationService->getNotifications();
-        return new JsonResponse($notifications, Response::HTTP_OK);
+        $requestData = $request->query->all();
+        $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
+        $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
+
+        $data = $this->notificationService->getNotifications();
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 
     /**

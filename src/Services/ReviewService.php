@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Entity\Review;
+use App\Repository\ReviewRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -17,31 +18,36 @@ class ReviewService
     private EntityManagerInterface $entityManager;
     private RequestCheckerService $requestCheckerService;
     private ObjectHandlerService $objectHandlerService;
+    private ReviewRepository $reviewRepository;
 
     /**
      * @param EntityManagerInterface $entityManager
      * @param RequestCheckerService $requestCheckerService
      * @param ObjectHandlerService $objectHandlerService
+     * @param ReviewRepository $reviewRepository
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         RequestCheckerService $requestCheckerService,
-        ObjectHandlerService $objectHandlerService
+        ObjectHandlerService $objectHandlerService,
+        ReviewRepository $reviewRepository
     ) {
         $this->entityManager = $entityManager;
         $this->requestCheckerService = $requestCheckerService;
         $this->objectHandlerService = $objectHandlerService;
+        $this->reviewRepository = $reviewRepository;
     }
-
 
     /**
+     * @param array $filters
+     * @param int $itemsPerPage
+     * @param int $page
      * @return array
      */
-    public function getReviews(): array
+    public function getReviews(array $filters, int $itemsPerPage, int $page): array
     {
-        return $this->entityManager->getRepository(Review::class)->findAll();
+        return $this->reviewRepositor->getAllByFilter($filters, $itemsPerPage, $page);
     }
-
 
     /**
      * @param int $id
@@ -58,7 +64,6 @@ class ReviewService
         return $review;
     }
 
-
     /**
      * @param array $data
      * @return Review
@@ -73,7 +78,6 @@ class ReviewService
         return $this->objectHandlerService->saveEntity($review, $data);
     }
 
-
     /**
      * @param int $id
      * @param array $data
@@ -86,7 +90,6 @@ class ReviewService
 
         return $this->objectHandlerService->saveEntity($review, $data);
     }
-
 
     /**
      * @param int $id

@@ -6,10 +6,11 @@ use App\Repository\GuestRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: GuestRepository::class)]
-class Guest
+class Guest  implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -215,5 +216,18 @@ class Guest
         }
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'documentNumber' => $this->getDocumentNumber(),
+            'phone' => $this->getPhone(),
+            'bookings' => $this->getBookings()->map(fn($b) => $b->getId())->toArray(),
+            'serviceOrders' => $this->getServiceOrders()->map(fn($s) => $s->getId())->toArray(),
+            'reviews' => $this->getReviews()->map(fn($r) => $r->getId())->toArray(),
+            'notifications' => $this->getNotifications()->map(fn($n) => $n->getId())->toArray(),
+        ];
     }
 }

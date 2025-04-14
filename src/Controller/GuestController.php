@@ -37,13 +37,18 @@ class GuestController extends AbstractController
     }
 
     /**
+     * @param Request $request
      * @return JsonResponse
      */
     #[Route('/', name: 'get_guests', methods: ['GET'])]
-    public function getGuests(): JsonResponse
+    public function getGuests(Request $request): JsonResponse
     {
-        $guests = $this->guestService->getGuests();
-        return new JsonResponse($guests, Response::HTTP_OK);
+        $requestData = $request->query->all();
+        $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
+        $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
+
+        $data = $this->guestService->getGuests();
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 
     /**

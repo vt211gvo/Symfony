@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Entity\Review;
 use App\Entity\ServiceOrder;
+use App\Repository\ServiceOrderRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -19,25 +20,30 @@ class ServiceOrderService
     private EntityManagerInterface $entityManager;
     private RequestCheckerService $requestCheckerService;
     private ObjectHandlerService $objectHandlerService;
+    private ServiceOrderRepository $serviceOrderRepository;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         RequestCheckerService $requestCheckerService,
-        ObjectHandlerService $objectHandlerService
+        ObjectHandlerService $objectHandlerService,
+        ServiceOrderRepository $serviceOrderRepository
     ) {
         $this->entityManager = $entityManager;
         $this->requestCheckerService = $requestCheckerService;
         $this->objectHandlerService = $objectHandlerService;
+        $this->serviceOrderRepository = $serviceOrderRepository;
     }
 
 
-
     /**
+     * @param array $filters
+     * @param int $itemsPerPage
+     * @param int $page
      * @return array
      */
-    public function getServiceOrders(): array
+    public function getServiceOrders(array $filters, int $itemsPerPage, int $page): array
     {
-        return $this->entityManager->getRepository(ServiceOrder::class)->findAll();
+        return $this->serviceOrderRepository->getAllByFilter($filters, $itemsPerPage, $page);
     }
 
 

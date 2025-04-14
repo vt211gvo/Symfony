@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Entity\Notification;
+use App\Repository\NotificationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -17,28 +18,35 @@ class NotificationService
     private EntityManagerInterface $entityManager;
     private RequestCheckerService $requestCheckerService;
     private ObjectHandlerService $objectHandlerService;
+    private NotificationRepository $notificationRepository;
 
     /**
      * @param EntityManagerInterface $entityManager
      * @param RequestCheckerService $requestCheckerService
      * @param ObjectHandlerService $objectHandlerService
+     * @param NotificationRepository $notificationRepository
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         RequestCheckerService $requestCheckerService,
-        ObjectHandlerService $objectHandlerService
+        ObjectHandlerService $objectHandlerService,
+        NotificationRepository $notificationRepository
     ) {
         $this->entityManager = $entityManager;
         $this->requestCheckerService = $requestCheckerService;
         $this->objectHandlerService = $objectHandlerService;
+        $this->notificationRepository = $notificationRepository;
     }
 
     /**
+     * @param array $filters
+     * @param int $itemsPerPage
+     * @param int $page
      * @return array
      */
-    public function getNotifications(): array
+    public function getNotifications(array $filters, int $itemsPerPage, int $page): array
     {
-        return $this->entityManager->getRepository(Notification::class)->findAll();
+        return $this->notificationRepository->getAllByFilter($filters, $itemsPerPage, $page);
     }
 
     /**

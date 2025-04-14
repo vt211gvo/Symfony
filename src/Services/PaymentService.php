@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Entity\Payment;
+use App\Repository\PaymentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -18,30 +19,36 @@ class PaymentService
     private EntityManagerInterface $entityManager;
     private RequestCheckerService $requestCheckerService;
     private ObjectHandlerService $objectHandlerService;
+    private PaymentRepository $paymentRepository;
 
     /**
      * @param EntityManagerInterface $entityManager
      * @param RequestCheckerService $requestCheckerService
      * @param ObjectHandlerService $objectHandlerService
+     * @param PaymentRepository $paymentRepository
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         RequestCheckerService $requestCheckerService,
-        ObjectHandlerService $objectHandlerService
+        ObjectHandlerService $objectHandlerService,
+        PaymentRepository $paymentRepository
     ) {
         $this->entityManager = $entityManager;
         $this->requestCheckerService = $requestCheckerService;
         $this->objectHandlerService = $objectHandlerService;
+        $this->paymentRepository = $paymentRepository;
     }
 
     /**
+     * @param array $filters
+     * @param int $itemsPerPage
+     * @param int $page
      * @return array
      */
-    public function getPayments(): array
+    public function getPayments(array $filters, int $itemsPerPage, int $page): array
     {
-        return $this->entityManager->getRepository(Payment::class)->findAll();
+        return $this->paymentRepository->getAllByFilter($filters, $itemsPerPage, $page);
     }
-
 
     /**
      * @param int $id

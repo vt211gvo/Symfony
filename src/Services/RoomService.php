@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Entity\Room;
+use App\Repository\RoomRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -18,29 +19,36 @@ class RoomService
     private EntityManagerInterface $entityManager;
     private RequestCheckerService $requestCheckerService;
     private ObjectHandlerService $objectHandlerService;
+    private RoomRepository $roomRepository;
 
     /**
      * @param EntityManagerInterface $entityManager
      * @param RequestCheckerService $requestCheckerService
      * @param ObjectHandlerService $objectHandlerService
+     * @param RoomRepository $roomRepository
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         RequestCheckerService $requestCheckerService,
-        ObjectHandlerService $objectHandlerService
+        ObjectHandlerService $objectHandlerService,
+        RoomRepository $roomRepository
     ) {
         $this->entityManager = $entityManager;
         $this->requestCheckerService = $requestCheckerService;
         $this->objectHandlerService = $objectHandlerService;
+        $this->roomRepository = $roomRepository;
     }
 
 
     /**
+     * @param array $filters
+     * @param int $itemsPerPage
+     * @param int $page
      * @return array
      */
-    public function getRooms(): array
+    public function getRooms(array $filters, int $itemsPerPage, int $page): array
     {
-        return $this->entityManager->getRepository(Room::class)->findAll();
+        return $this->roomRepository->getAllByFilter($filters, $itemsPerPage, $page);
     }
 
 
