@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * NotificationController handles notification-related operations.
@@ -40,6 +41,7 @@ class NotificationController extends AbstractController
      * @param Request $request
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_USER")]
     #[Route('/', name: 'get_notifications', methods: ['GET'])]
     public function getNotifications(Request $request): JsonResponse
     {
@@ -47,7 +49,7 @@ class NotificationController extends AbstractController
         $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
         $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
 
-        $data = $this->notificationService->getNotifications();
+        $data = $this->notificationService->getNotifications($requestData, $itemsPerPage, $page);
         return new JsonResponse($data, Response::HTTP_OK);
     }
 
@@ -55,6 +57,7 @@ class NotificationController extends AbstractController
      * @param int $id
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_USER")]
     #[Route('/{id}', name: 'get_notification', methods: ['GET'])]
     public function getNotification(int $id): JsonResponse
     {
@@ -67,6 +70,7 @@ class NotificationController extends AbstractController
      * @return JsonResponse
      * @throws \DateMalformedStringException
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/', name: 'create_notification', methods: ['POST'])]
     public function createNotification(Request $request): JsonResponse
     {
@@ -83,6 +87,7 @@ class NotificationController extends AbstractController
      * @return JsonResponse
      * @throws \DateMalformedStringException
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/{id}', name: 'update_notification', methods: ['PATCH'])]
     public function updateNotification(Request $request, int $id): JsonResponse
     {
@@ -97,6 +102,7 @@ class NotificationController extends AbstractController
      * @param int $id
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/{id}', name: 'delete_notification', methods: ['DELETE'])]
     public function deleteNotification(int $id): JsonResponse
     {

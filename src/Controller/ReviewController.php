@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * ReviewController handles review-related operations.
@@ -40,6 +41,7 @@ class ReviewController extends AbstractController
      * @param Request $request
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_USER")]
     #[Route('/', name: 'get_reviews', methods: ['GET'])]
     public function getReviews(Request $request): JsonResponse
     {
@@ -47,7 +49,7 @@ class ReviewController extends AbstractController
         $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
         $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
 
-        $data = $this->reviewService->getReviews();
+        $data = $this->reviewService->getReviews($requestData, $itemsPerPage, $page);
         return new JsonResponse($data, Response::HTTP_OK);
     }
 
@@ -55,6 +57,7 @@ class ReviewController extends AbstractController
      * @param int $id
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_USER")]
     #[Route('/{id}', name: 'get_review', methods: ['GET'])]
     public function getReview(int $id): JsonResponse
     {
@@ -67,6 +70,7 @@ class ReviewController extends AbstractController
      * @return JsonResponse
      * @throws \DateMalformedStringException
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/', name: 'create_review', methods: ['POST'])]
     public function createReview(Request $request): JsonResponse
     {
@@ -83,6 +87,7 @@ class ReviewController extends AbstractController
      * @return JsonResponse
      * @throws \DateMalformedStringException
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/{id}', name: 'update_review', methods: ['PATCH'])]
     public function updateReview(Request $request, int $id): JsonResponse
     {
@@ -97,6 +102,7 @@ class ReviewController extends AbstractController
      * @param int $id
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/{id}', name: 'delete_review', methods: ['DELETE'])]
     public function deleteReview(int $id): JsonResponse
     {

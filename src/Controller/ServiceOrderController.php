@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * ServiceOrderController handles service order-related operations.
@@ -40,6 +41,7 @@ class ServiceOrderController extends AbstractController
      * @param Request $request
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_USER")]
     #[Route('/', name: 'get_service_orders', methods: ['GET'])]
     public function getServiceOrders(Request $request): JsonResponse
     {
@@ -47,7 +49,7 @@ class ServiceOrderController extends AbstractController
         $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
         $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
 
-        $data = $this->serviceOrderService->getServiceOrders();
+        $data = $this->serviceOrderService->getServiceOrders($requestData, $itemsPerPage, $page);
         return new JsonResponse($data, Response::HTTP_OK);
     }
 
@@ -55,6 +57,7 @@ class ServiceOrderController extends AbstractController
      * @param int $id
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_USER")]
     #[Route('/{id}', name: 'get_service_order', methods: ['GET'])]
     public function getServiceOrder(int $id): JsonResponse
     {
@@ -67,6 +70,7 @@ class ServiceOrderController extends AbstractController
      * @return JsonResponse
      * @throws \DateMalformedStringException
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/', name: 'create_service_order', methods: ['POST'])]
     public function createServiceOrder(Request $request): JsonResponse
     {
@@ -83,6 +87,7 @@ class ServiceOrderController extends AbstractController
      * @return JsonResponse
      * @throws \DateMalformedStringException
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/{id}', name: 'update_service_order', methods: ['PATCH'])]
     public function updateServiceOrder(Request $request, int $id): JsonResponse
     {
@@ -97,6 +102,7 @@ class ServiceOrderController extends AbstractController
      * @param int $id
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/{id}', name: 'delete_service_order', methods: ['DELETE'])]
     public function deleteServiceOrder(int $id): JsonResponse
     {

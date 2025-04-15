@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * StaffController handles staff-related operations.
@@ -42,6 +43,7 @@ class StaffController extends AbstractController
      * @param Request $request
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_USER")]
     #[Route('/', name: 'get_staff', methods: ['GET'])]
     public function getStaff(Request $request): JsonResponse
     {
@@ -49,7 +51,7 @@ class StaffController extends AbstractController
         $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
         $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
 
-        $data = $this->staffService->getStaff();
+        $data = $this->staffService->getStaff($requestData, $itemsPerPage, $page);
         return new JsonResponse($data, Response::HTTP_OK);
     }
 
@@ -59,6 +61,7 @@ class StaffController extends AbstractController
      * @param int $id
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_USER")]
     #[Route('/{id}', name: 'get_staff_member', methods: ['GET'])]
     public function getStaffMember(int $id): JsonResponse
     {
@@ -73,6 +76,7 @@ class StaffController extends AbstractController
      * @return JsonResponse
      * @throws \DateMalformedStringException
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/', name: 'create_staff_member', methods: ['POST'])]
     public function createStaffMember(Request $request): JsonResponse
     {
@@ -91,6 +95,7 @@ class StaffController extends AbstractController
      * @return JsonResponse
      * @throws \DateMalformedStringException
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/{id}', name: 'update_staff_member', methods: ['PATCH'])]
     public function updateStaffMember(Request $request, int $id): JsonResponse
     {
@@ -107,6 +112,7 @@ class StaffController extends AbstractController
      * @param int $id
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/{id}', name: 'delete_staff_member', methods: ['DELETE'])]
     public function deleteStaffMember(int $id): JsonResponse
     {

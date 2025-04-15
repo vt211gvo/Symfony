@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * ServiceController handles service-related operations.
@@ -40,6 +41,7 @@ class ServiceController extends AbstractController
      * @param Request $request
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_USER")]
     #[Route('/', name: 'get_services', methods: ['GET'])]
     public function getServices(Request $request): JsonResponse
     {
@@ -47,7 +49,7 @@ class ServiceController extends AbstractController
         $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
         $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
 
-        $data = $this->serviceService->getServices();
+        $data = $this->serviceService->getServices($requestData, $itemsPerPage, $page);
         return new JsonResponse($data, Response::HTTP_OK);
     }
 
@@ -55,6 +57,7 @@ class ServiceController extends AbstractController
      * @param int $id
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_USER")]
     #[Route('/{id}', name: 'get_service', methods: ['GET'])]
     public function getService(int $id): JsonResponse
     {
@@ -67,6 +70,7 @@ class ServiceController extends AbstractController
      * @return JsonResponse
      * @throws \DateMalformedStringException
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/', name: 'create_service', methods: ['POST'])]
     public function createService(Request $request): JsonResponse
     {
@@ -83,6 +87,7 @@ class ServiceController extends AbstractController
      * @return JsonResponse
      * @throws \DateMalformedStringException
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/{id}', name: 'update_service', methods: ['PATCH'])]
     public function updateService(Request $request, int $id): JsonResponse
     {
@@ -97,6 +102,7 @@ class ServiceController extends AbstractController
      * @param int $id
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/{id}', name: 'delete_service', methods: ['DELETE'])]
     public function deleteService(int $id): JsonResponse
     {

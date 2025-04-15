@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * GuestController handles guest-related operations.
@@ -40,6 +41,7 @@ class GuestController extends AbstractController
      * @param Request $request
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_USER")]
     #[Route('/', name: 'get_guests', methods: ['GET'])]
     public function getGuests(Request $request): JsonResponse
     {
@@ -47,7 +49,7 @@ class GuestController extends AbstractController
         $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
         $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
 
-        $data = $this->guestService->getGuests();
+        $data = $this->guestService->getGuests($requestData, $itemsPerPage, $page);
         return new JsonResponse($data, Response::HTTP_OK);
     }
 
@@ -55,6 +57,7 @@ class GuestController extends AbstractController
      * @param int $id
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_USER")]
     #[Route('/{id}', name: 'get_guest', methods: ['GET'])]
     public function getGuest(int $id): JsonResponse
     {
@@ -67,6 +70,7 @@ class GuestController extends AbstractController
      * @return JsonResponse
      * @throws \DateMalformedStringException
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/', name: 'create_guest', methods: ['POST'])]
     public function createGuest(Request $request): JsonResponse
     {
@@ -83,6 +87,7 @@ class GuestController extends AbstractController
      * @return JsonResponse
      * @throws \DateMalformedStringException
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/{id}', name: 'update_guest', methods: ['PATCH'])]
     public function updateGuest(Request $request, int $id): JsonResponse
     {
@@ -97,6 +102,7 @@ class GuestController extends AbstractController
      * @param int $id
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/{id}', name: 'delete_guest', methods: ['DELETE'])]
     public function deleteGuest(int $id): JsonResponse
     {

@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * PaymentController handles payment-related operations.
@@ -40,6 +41,7 @@ class PaymentController extends AbstractController
      * @param Request $request
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_USER")]
     #[Route('/', name: 'get_payments', methods: ['GET'])]
     public function getPayments(Request $request): JsonResponse
     {
@@ -47,7 +49,7 @@ class PaymentController extends AbstractController
         $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
         $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
 
-        $data = $this->paymentService->getPayments();
+        $data = $this->paymentService->getPayments($requestData, $itemsPerPage, $page);
         return new JsonResponse($data, Response::HTTP_OK);
     }
 
@@ -55,6 +57,7 @@ class PaymentController extends AbstractController
      * @param int $id
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_USER")]
     #[Route('/{id}', name: 'get_payment', methods: ['GET'])]
     public function getPayment(int $id): JsonResponse
     {
@@ -67,6 +70,7 @@ class PaymentController extends AbstractController
      * @return JsonResponse
      * @throws \DateMalformedStringException
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/', name: 'create_payment', methods: ['POST'])]
     public function createPayment(Request $request): JsonResponse
     {
@@ -83,6 +87,7 @@ class PaymentController extends AbstractController
      * @return JsonResponse
      * @throws \DateMalformedStringException
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/{id}', name: 'update_payment', methods: ['PATCH'])]
     public function updatePayment(Request $request, int $id): JsonResponse
     {
@@ -97,6 +102,7 @@ class PaymentController extends AbstractController
      * @param int $id
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/{id}', name: 'delete_payment', methods: ['DELETE'])]
     public function deletePayment(int $id): JsonResponse
     {

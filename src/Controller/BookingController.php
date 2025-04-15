@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * BookingController handles booking-related operations.
@@ -40,6 +41,7 @@ class BookingController extends AbstractController
      * @param Request $request
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_USER")]
     #[Route('/', name: 'get_bookings', methods: ['GET'])]
     public function getBookings(Request $request): JsonResponse
     {
@@ -56,6 +58,7 @@ class BookingController extends AbstractController
      * @param int $id
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_USER")]
     #[Route('/{id}', name: 'get_booking', methods: ['GET'])]
     public function getBooking(int $id): JsonResponse
     {
@@ -68,6 +71,7 @@ class BookingController extends AbstractController
      * @return JsonResponse
      * @throws \DateMalformedStringException
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/', name: 'create_booking', methods: ['POST'])]
     public function createBooking(Request $request): JsonResponse
     {
@@ -84,6 +88,7 @@ class BookingController extends AbstractController
      * @return JsonResponse
      * @throws \DateMalformedStringException
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/{id}', name: 'update_booking', methods: ['PATCH'])]
     public function updateBooking(Request $request, int $id): JsonResponse
     {
@@ -98,6 +103,7 @@ class BookingController extends AbstractController
      * @param int $id
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/{id}', name: 'delete_booking', methods: ['DELETE'])]
     public function deleteBooking(int $id): JsonResponse
     {

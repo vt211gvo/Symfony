@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * RoomController handles room-related operations.
@@ -40,6 +41,7 @@ class RoomController extends AbstractController
      * @param Request $request
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_USER")]
     #[Route('/', name: 'get_rooms', methods: ['GET'])]
     public function getRooms(Request $request): JsonResponse
     {
@@ -47,7 +49,7 @@ class RoomController extends AbstractController
         $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
         $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
 
-        $data = $this->roomService->getRooms();
+        $data = $this->roomService->getRooms($requestData, $itemsPerPage, $page);
         return new JsonResponse($data, Response::HTTP_OK);
     }
 
@@ -55,6 +57,7 @@ class RoomController extends AbstractController
      * @param int $id
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_USER")]
     #[Route('/{id}', name: 'get_room', methods: ['GET'])]
     public function getRoom(int $id): JsonResponse
     {
@@ -67,6 +70,7 @@ class RoomController extends AbstractController
      * @return JsonResponse
      * @throws \DateMalformedStringException
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/', name: 'create_room', methods: ['POST'])]
     public function createRoom(Request $request): JsonResponse
     {
@@ -83,6 +87,7 @@ class RoomController extends AbstractController
      * @return JsonResponse
      * @throws \DateMalformedStringException
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/{id}', name: 'update_room', methods: ['PATCH'])]
     public function updateRoom(Request $request, int $id): JsonResponse
     {
@@ -97,6 +102,7 @@ class RoomController extends AbstractController
      * @param int $id
      * @return JsonResponse
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/{id}', name: 'delete_room', methods: ['DELETE'])]
     public function deleteRoom(int $id): JsonResponse
     {
