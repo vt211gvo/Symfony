@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Action\Booking\BookingStatusUpdateAction;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -33,6 +34,12 @@ use Symfony\Component\Validator\Constraints as Assert;
             denormalizationContext: ['groups' => 'patch:item:booking']
         ),
         new Delete(),
+        new Patch(
+            uriTemplate: '/bookings/{id}/check-available',
+            controller: BookingStatusUpdateAction::class,
+            denormalizationContext: ['groups' => 'patch:item:booking'],
+            name: 'check_available'
+        ),
     ],
 )]
 #[ORM\Entity]

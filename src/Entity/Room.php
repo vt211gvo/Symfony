@@ -32,6 +32,12 @@ use Symfony\Component\Validator\Constraints as Assert;
             normalizationContext: ['groups' => 'get:item:room'],
             denormalizationContext: ['groups' => 'patch:item:room']
         ),
+        new Patch(
+            uriTemplate: '/rooms/{id}/status',
+            controller: CheckAvailableRoomsAction::class,
+            denormalizationContext: ['groups' => 'patch:item:room'],
+            name: 'update_status'
+        ),
         new Delete(),
     ],
 )]
