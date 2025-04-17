@@ -25,3 +25,8 @@ services:
 
     App\EventListener\RuntimeConstraintExceptionListener:
         tags: [ { name: 'kernel.event_listener', event: 'kernel.exception' } ]
+
+    App\EventListener\Room\RoomPreUpdateListener:
+        tags: [ { name: 'doctrine.event_listener', event: 'event.preUpdate' } ]
+    App\EventListener\Booking\BookingPostUpdateListener:
+        tags: [ { name: 'doctrine.event_listener', event: 'event.postUpdate' } ]
