@@ -2,34 +2,78 @@
 
 namespace App\Entity;
 
-use App\Repository\ServiceOrderRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: ServiceOrderRepository::class)]
+#[ApiResource(
+    operations: [
+        new Get(
+            normalizationContext: ['groups' => 'get:item:serviceOrder']
+        ),
+        new GetCollection(
+            normalizationContext: ['groups' => 'get:collection:serviceOrder']
+        ),
+        new Post(
+            normalizationContext: ['groups' => 'get:item:serviceOrder'],
+            denormalizationContext: ['groups' => 'post:collection:serviceOrder']
+        ),
+        new Patch(
+            normalizationContext: ['groups' => 'get:item:serviceOrder'],
+            denormalizationContext: ['groups' => 'patch:item:serviceOrder']
+        ),
+        new Delete(),
+    ],
+)]
+#[ORM\Entity]
 class ServiceOrder implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['get:item:serviceOrder', 'get:collection:serviceOrder'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'serviceOrders')]
     #[Assert\NotNull(message: 'Guest cannot be null')]
     #[Assert\Valid]
+    #[Groups([
+        'get:item:serviceOrder',
+        'get:collection:serviceOrder',
+        'post:collection:serviceOrder',
+        'patch:item:serviceOrder'
+    ])]
     private ?Guest $guest = null;
 
     #[ORM\ManyToOne(inversedBy: 'serviceOrders')]
     #[Assert\NotNull(message: 'Service cannot be null')]
     #[Assert\Valid]
+    #[Groups([
+        'get:item:serviceOrder',
+        'get:collection:serviceOrder',
+        'post:collection:serviceOrder',
+        'patch:item:serviceOrder'
+    ])]
     private ?Service $service = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Assert\NotNull(message: 'Order date cannot be null')]
     #[Assert\Date(message: 'Order date must be a valid date')]
     #[Assert\LessThanOrEqual("today", message: 'Order date must be today or in the past')]
+    #[Groups([
+        'get:item:serviceOrder',
+        'get:collection:serviceOrder',
+        'post:collection:serviceOrder',
+        'patch:item:serviceOrder'
+    ])]
     private ?\DateTimeInterface $orderDate = null;
 
     public function getId(): ?int

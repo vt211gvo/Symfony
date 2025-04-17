@@ -2,19 +2,45 @@
 
 namespace App\Entity;
 
-use App\Repository\GuestRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: GuestRepository::class)]
+#[ApiResource(
+    operations: [
+        new Get(
+            normalizationContext: ['groups' => 'get:item:guest']
+        ),
+        new GetCollection(
+            normalizationContext: ['groups' => 'get:collection:guest']
+        ),
+        new Post(
+            normalizationContext: ['groups' => 'get:item:guest'],
+            denormalizationContext: ['groups' => 'post:collection:guest']
+        ),
+        new Patch(
+            normalizationContext: ['groups' => 'get:item:guest'],
+            denormalizationContext: ['groups' => 'patch:item:guest']
+        ),
+        new Delete(),
+    ],
+)]
+#[ORM\Entity]
 class Guest  implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['get:item:guest', 'get:collection:guest'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -23,6 +49,12 @@ class Guest  implements JsonSerializable
         max: 255,
         maxMessage: 'Document number cannot be longer than {{ limit }} characters.'
     )]
+    #[Groups([
+        'get:item:guest',
+        'get:collection:guest',
+        'post:collection:guest',
+        'patch:item:guest'
+    ])]
     private ?string $documentNumber = null;
 
     #[ORM\Column(length: 255)]
@@ -35,30 +67,40 @@ class Guest  implements JsonSerializable
         pattern: '/^\+?[0-9]{7,15}$/',
         message: 'Phone number must be a valid international format.'
     )]
+    #[Groups([
+        'get:item:guest',
+        'get:collection:guest',
+        'post:collection:guest',
+        'patch:item:guest'
+    ])]
     private ?string $phone = null;
 
     /**
      * @var Collection<int, Booking>
      */
     #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'guest')]
+    #[Groups(['get:item:guest'])]
     private Collection $bookings;
 
     /**
      * @var Collection<int, ServiceOrder>
      */
     #[ORM\OneToMany(targetEntity: ServiceOrder::class, mappedBy: 'guest')]
+    #[Groups(['get:item:guest'])]
     private Collection $serviceOrders;
 
     /**
      * @var Collection<int, Review>
      */
     #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'guest')]
+    #[Groups(['get:item:guest'])]
     private Collection $reviews;
 
     /**
      * @var Collection<int, Notification>
      */
     #[ORM\OneToMany(targetEntity: Notification::class, mappedBy: 'guest')]
+    #[Groups(['get:item:guest'])]
     private Collection $notifications;
 
     public function __construct()

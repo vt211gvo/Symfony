@@ -2,37 +2,88 @@
 
 namespace App\Entity;
 
-use App\Repository\BookingRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: BookingRepository::class)]
+#[ApiResource(
+    operations: [
+        new Get(
+            normalizationContext: ['groups' => 'get:item:booking']
+        ),
+        new GetCollection(
+            normalizationContext: ['groups' => 'get:collection:booking']
+        ),
+        new Post(
+            normalizationContext: ['groups' => 'get:item:booking'],
+            denormalizationContext: ['groups' => 'post:collection:booking']
+        ),
+        new Patch(
+            normalizationContext: ['groups' => 'get:item:booking'],
+            denormalizationContext: ['groups' => 'patch:item:booking']
+        ),
+        new Delete(),
+    ],
+)]
+#[ORM\Entity]
 class Booking implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['get:item:booking', 'get:collection:booking'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookings')]
     #[Assert\NotNull]
+    #[Groups([
+        'get:item:booking',
+        'get:collection:booking',
+        'post:collection:booking',
+        'patch:item:booking'
+    ])]
     private ?Guest $guest = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookings')]
     #[Assert\NotNull]
+    #[Groups([
+        'get:item:booking',
+        'get:collection:booking',
+        'post:collection:booking',
+        'patch:item:booking'
+    ])]
     private ?Bed $bed = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\NotNull]
+    #[Groups([
+        'get:item:booking',
+        'get:collection:booking',
+        'post:collection:booking',
+        'patch:item:booking'
+    ])]
     private ?\DateTimeInterface $checkinDate = null;
+
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\NotNull]
     #[Assert\GreaterThan(propertyPath: "checkinDate", message: "Checkout date must be later than check-in date.")]
+    #[Groups([
+        'get:item:booking',
+        'get:collection:booking',
+        'post:collection:booking',
+        'patch:item:booking'
+    ])]
     private ?\DateTimeInterface $checkoutDate = null;
 
     #[ORM\Column(length: 255)]
@@ -42,6 +93,12 @@ class Booking implements JsonSerializable
         max: 255,
         maxMessage: 'Status cannot be longer than {{ limit }} characters.'
     )]
+    #[Groups([
+        'get:item:booking',
+        'get:collection:booking',
+        'post:collection:booking',
+        'patch:item:booking'
+    ])]
     private ?string $status = null;
 
     /**
@@ -51,6 +108,7 @@ class Booking implements JsonSerializable
     #[Assert\All([
         new Assert\Type(type: Payment::class, message: 'Each payment must be a valid Payment object.')
     ])]
+    #[Groups(['get:item:booking'])]
     private Collection $payments;
 
     public function __construct()
